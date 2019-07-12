@@ -2,11 +2,11 @@
 
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'azure-msi-token-provider/version'
+require 'azure-msi-token_provider/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = 'azure-msi-token-provider'
-  spec.version       = AzureMSITokenProvider::VERSION
+  spec.name          = 'azure-msi-token_provider'
+  spec.version       = Azure::Auth::TokenProvider::VERSION
   spec.authors       = ['Andrey Maraev']
   spec.email         = ['the_vk@thevk.net']
 
@@ -15,7 +15,7 @@ Gem::Specification.new do |spec|
     A simple to use gem to obtain Azure MSI access token.
     Supports both Azure Cloud environment and local development.
   DESCRIPTION
-  spec.homepage      = 'https://github.com/the-vk/gem-azure-msi-token-provider'
+  spec.homepage      = 'https://github.com/the-vk/gem-azure-auth-token_provider'
   spec.license       = 'MIT'
 
   spec.files         = Dir.glob('{lib}/**/*') + %w[LICENSE README.md]

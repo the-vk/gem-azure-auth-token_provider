@@ -62,10 +62,10 @@ module Azure
         # @return [AzureMSITokenProvider::Token]
         def token_nix
           Open3.popen2(
-            { PATH: DEFAULT_AZ_PATH },
+            { "PATH" => DEFAULT_AZ_PATH },
             "#{BASH} #{AZ_GET_TOKEN}"
           ) do |_, o, t|
-            return nil unless t.value.zero?
+            return nil unless t.value == 0
 
             return parse_json_token(o.read)
           end

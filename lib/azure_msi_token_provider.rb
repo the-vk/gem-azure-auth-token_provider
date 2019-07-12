@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'azure-msu-token-provider/azure_cli_token_provider'
+require 'azure-msi-token-provider/azure_cli_token_source'
 
 # A provider that reads access to Azure MSI token.
 class AzureMSITokenProvider
@@ -32,7 +32,7 @@ class AzureMSITokenProvider
     # Returns an array of token sources
     # @return [Array<#token>]
     def token_sources
-      []
+      [AzureCliTokenSource.new]
     end
   end
 end

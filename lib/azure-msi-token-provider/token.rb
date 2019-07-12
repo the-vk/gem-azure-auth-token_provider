@@ -2,9 +2,15 @@
 
 require 'date'
 
-module AzureMSITokenProvider
+class AzureMSITokenProvider
   # Azure OAuth2 access token
   class Token
+    # Initializes new instance of Token
+    # @param access_token [String] JWT access token
+    # @param expires_on [Time] Date and time when token expires
+    # @param subscription [String] Azure subscription id
+    # @param tenant [String] Azure AD app tenant id
+    # @param token_type [String] Token type
     def initialize(access_token, expires_on, subscription, tenant, token_type)
       @access_token = access_token
       @expires_on = expires_on

@@ -34,15 +34,20 @@ module Azure
         # Initializes new instance of Token
         # @param access_token [String] JWT access token
         # @param expires_on [Time] Date and time when token expires
-        # @param subscription [String] Azure subscription id
-        # @param tenant [String] Azure AD app tenant id
         # @param token_type [String] Token type
-        def initialize(access_token, expires_on, subscription, tenant, token_type)
+        # @param ext [Hash] extra data
+        def initialize(access_token, expires_on, token_type, ext)
           @access_token = access_token
           @expires_on = expires_on
-          @subscription = subscription
-          @tenant = tenant
           @token_type = token_type
+
+          @subscription = ext.fetch(:subscription, nil)
+          @tenant = ext.fetch(:tenant, nil)
+          @client_id = ext.fetch(:client_id, nil)
+          @expires_in = ext.fetch(:expires_in, nil)
+          @ext_expires_in = ext.fetch(:ext_expires_in, nil)
+          @not_before = ext.fetch(:not_before, nil)
+          @resource = ext.fetch(:resource, nil)
         end
 
         # JWT access token
@@ -50,7 +55,7 @@ module Azure
         attr_reader :access_token
 
         # Date and time when token expires
-        # @return [Date]
+        # @return [Time]
         attr_reader :expires_on
 
         # Azure subscription id
@@ -64,6 +69,26 @@ module Azure
         # Token type
         # @return [String]
         attr_reader :token_type
+
+        # Client Id
+        # @return [String]
+        attr_reader :client_id
+
+        # TTL in seconds
+        # @return [Number]
+        attr_reader :expires_in
+
+        # Ext expires in
+        # @return [Time]
+        attr_reader :ext_expires_in
+
+        # Date and time before which token is not valid
+        # @return [Time]
+        attr_reader :not_before
+
+        # URI of resource token is valid for
+        # @return [String]
+        attr_reader :resource
 
         # Is token expired?
         # @return [Boolean]

@@ -25,6 +25,7 @@
 #-------------------------------------------------------------------------------
 
 require 'azure/auth/token_provider/azure_cli_token_source'
+require 'azure/auth/token_provider/msi_token_source'
 
 # A provider that reads access to Azure MSI token.
 module Azure
@@ -42,23 +43,22 @@ module Azure
         # Reads an access token from one of the known token sources
         # @return [AzureMSITokenProvider::Token]
         def read_token_from_source
-          t = nil
-
+          return @selected_source.token unless @selected_source.nil?
           token_sources.each do |ts|
             begin
               t = ts.token
+              @selected_source = ts
+              return t
             rescue StandardError
               next
             end
           end
-
-          t
         end
 
         # Returns an array of token sources
         # @return [Array<#token>]
         def token_sources
-          [AzureCliTokenSource.new]
+          [AzureCliTokenSource.new, MsiTokenSource.new]
         end
       end
     end

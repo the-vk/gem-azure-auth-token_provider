@@ -24,67 +24,53 @@
 # SOFTWARE.
 #-------------------------------------------------------------------------------
 
-require 'json'
-require 'open3'
-require 'time'
+require 'net/http'
+require 'uri'
 
 require 'azure/auth/token_provider/token'
 
 module Azure
   module Auth
     class TokenProvider
-      # A token source that gets token using cli tool az
-      class AzureCliTokenSource
-        DEFAULT_AZ_PATH = '/usr/bin:/usr/local/bin'
-        BASH = '/bin/bash'
-        AZ_GET_TOKEN = 'az account get-access-token -o json'
+      # Provdes OAuth 2.0 access token by calling Azure MV IDMS
+      class MsiTokenSource
+        AZURE_VM_IDMS_ENDPOINT =
+          'http://169.254.169.254/metadata/identity/oauth2/token'
+        API_VERSION = 'api-version=2018-02-01'
+        DEFAULT_RESOURCE = 'https://management.azure.com'
 
-        # Returns an access token from cli tool az
-        # @return [AzureMSITokenProvider::Token]
-        def token
-          if Gem.win_platform?
-            token_windows
-          else
-            token_nix
-          end
+        def token(resource = DEFAULT_RESOURCE)
+          query_params = "#{API_VERSION}&resource=#{resource}"
+          uri_src = "#{AZURE_VM_IDMS_ENDPOINT}?#{query_params}"
+          uri = URI.parse(uri_src)
+          http = Net::HTTP.new(uri.host, uri.port)
+          request = Net::HTTP::Get.new(uri.request_uri)
+          request['Metadata'] = 'true'
+          response = http.request(request)
+          return nil if response.code != '200'
+
+          parse_json_token(response.body)
         end
 
         private
 
-        # Calls az on windows OS
-        # @return [AzureMSITokenProvider::Token]
-        def token_windows
-          # TODO
-          nil
-        end
-
-        # Calls az on *nix OS
-        # @return [AzureMSITokenProvider::Token]
-        def token_nix
-          Open3.popen2(
-            { "PATH" => DEFAULT_AZ_PATH },
-            "#{BASH} #{AZ_GET_TOKEN}"
-          ) do |_, o, t|
-            return nil unless t.value == 0
-
-            return parse_json_token(o.read)
-          end
-        end
-
         def parse_json_token(token_src)
           token_hash = JSON.parse(token_src)
           Token.new(
-            token_hash['accessToken'],
-            Time.parse(token_hash['expiresOn']),
-            token_hash['tokenType'],
+            token_hash['access_token'],
+            Time.at(token_hash['expires_on'].to_i),
+            token_hash['token_type'],
             read_ext(token_hash)
           )
         end
 
         def read_ext(token_hash)
           {
-            subscription: token_hash['subscription'],
-            tenant: token_hash['tenant']
+            client_id: token_hash['client_id'],
+            expires_in: token_hash['expires_in'].to_i,
+            ext_expires_in: token_hash['ext_expires_in'].to_i,
+            not_before: Time.at(token_hash['not_before'].to_i),
+            resource: token_hash['resource']
           }
         end
       end

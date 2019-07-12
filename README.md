@@ -1,0 +1,1 @@
+# gem-azure-msi-token-provider

@@ -30,7 +30,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'azure/auth/token_provider/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = 'azure-msi-token_provider'
+  spec.name          = 'azure-auth-token_provider'
   spec.version       = Azure::Auth::TokenProvider::VERSION
   spec.authors       = ['Andrey Maraev']
   spec.email         = ['the_vk@thevk.net']
@@ -45,6 +45,4 @@ Gem::Specification.new do |spec|
 
   spec.files         = Dir.glob('{lib}/**/*') + %w[LICENSE README.md]
   spec.require_paths = ['lib']
-
-  spec.add_development_dependency 'rake', '~> 12.0'
 end

@@ -40,12 +40,13 @@ module Azure
         AZ_GET_TOKEN = 'az account get-access-token -o json'
 
         # Returns an access token from cli tool az
+        # @param resource [Stirng] Azure resource URI string.
         # @return [AzureMSITokenProvider::Token]
-        def token
+        def token(resource)
           if Gem.win_platform?
-            token_windows
+            token_windows(resource)
           else
-            token_nix
+            token_nix(resource)
           end
         end
 
@@ -53,17 +54,17 @@ module Azure
 
         # Calls az on windows OS
         # @return [AzureMSITokenProvider::Token]
-        def token_windows
+        def token_windows(resource)
           # TODO
           nil
         end
 
         # Calls az on *nix OS
         # @return [AzureMSITokenProvider::Token]
-        def token_nix
+        def token_nix(resource)
           Open3.popen2(
-            { "PATH" => DEFAULT_AZ_PATH },
-            "#{BASH} #{AZ_GET_TOKEN}"
+            { 'PATH' => DEFAULT_AZ_PATH },
+            "#{BASH} #{AZ_GET_TOKEN} --resource #{resource}"
           ) do |_, o, t|
             return nil unless t.value == 0
 

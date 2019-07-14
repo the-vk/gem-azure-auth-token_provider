@@ -37,7 +37,6 @@ module Azure
         AZURE_VM_IDMS_ENDPOINT =
           'http://169.254.169.254/metadata/identity/oauth2/token'
         API_VERSION = 'api-version=2018-02-01'
-        DEFAULT_RESOURCE = 'https://management.azure.com'
 
         def token(resource = DEFAULT_RESOURCE)
           query_params = "#{API_VERSION}&resource=#{resource}"

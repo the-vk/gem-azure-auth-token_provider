@@ -31,22 +31,29 @@ require 'azure/auth/token_provider/msi_token_source'
 module Azure
   module Auth
     class TokenProvider
+      DEFAULT_RESOURCE = 'https://management.azure.com'
+
       class << self
         # Returns an access token
+        # @param resource [String] Azure resource URI
         # @return [AzureMSITokenProvider::Token]
-        def token
-          @token = read_token_from_source if @token.nil? || @token.is_expired?
+        def token(resource = DEFAULT_RESOURCE)
+          @token = read_token_from_source(resource) if
+            @token.nil? ||
+            @token.is_expired? ||
+            @token.resource != resource
         end
 
         private
 
         # Reads an access token from one of the known token sources
         # @return [AzureMSITokenProvider::Token]
-        def read_token_from_source
+        def read_token_from_source(resource)
           return @selected_source.token unless @selected_source.nil?
+
           token_sources.each do |ts|
             begin
-              t = ts.token
+              t = ts.token(resource)
               @selected_source = ts
               return t
             rescue StandardError

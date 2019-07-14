@@ -54,7 +54,7 @@ module Azure
 
         # Calls az on windows OS
         # @return [AzureMSITokenProvider::Token]
-        def token_windows(resource)
+        def token_windows(_resource)
           # TODO
           nil
         end
